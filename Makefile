@@ -12,13 +12,13 @@ docker-down:
 	docker compose down -v
 
 migrate-up:
-	migrate -path migrations -database "postgres://superbooks:superbooks_dev_password@localhost:5432/superbooks_dev?sslmode=disable" up
+	migrate -path src/migrations -database "postgres://superbooks:superbooks_dev_password@localhost:5432/superbooks_dev?sslmode=disable" up
 
 migrate-down:
-	migrate -path migrations -database "postgres://superbooks:superbooks_dev_password@localhost:5432/superbooks_dev?sslmode=disable" down
+	migrate -path src/migrations -database "postgres://superbooks:superbooks_dev_password@localhost:5432/superbooks_dev?sslmode=disable" down
 
 migrate-force:
-	migrate -path migrations -database "postgres://superbooks:superbooks_dev_password@localhost:5432/superbooks_dev?sslmode=disable" force ${VERSION}
+	migrate -path src/migrations -database "postgres://superbooks:superbooks_dev_password@localhost:5432/superbooks_dev?sslmode=disable" force ${VERSION}
 
 test:
 	go test -v -race -cover ./...
@@ -30,7 +30,7 @@ lint:
 	golangci-lint run ./...
 
 run:
-	go run ./cmd/server
+	go run ./src/cmd/server
 
 clean:
 	docker compose down -v --remove-orphans
