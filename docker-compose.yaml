@@ -1,0 +1,42 @@
+version: '3.9'
+
+services:
+  postgres:
+    image: postgres:16-alpine
+    container_name: super-books-db
+    environment:
+      POSTGRES_USER: superbooks
+      POSTGRES_PASSWORD: superbooks_dev_password
+      POSTGRES_DB: superbooks_dev
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U superbooks"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  app:
+    build:
+      context: .
+      dockerfile: docker/Dockerfile.dev
+    container_name: super-books-api
+    environment:
+      DATABASE_URL: postgres://superbooks:superbooks_dev_password@postgres:5432/superbooks_dev?sslmode=disable
+      JWT_SECRET: dev_jwt_secret_change_in_production
+      JWT_EXPIRY: 1h
+      REFRESH_TOKEN_EXPIRY: 168h
+    ports:
+      - "8080:8080"
+    depends_on:
+      postgres:
+        condition: service_healthy
+    volumes:
+      - .:/app
+      - /app/vendor
+    command: air -c .air.toml
+
+volumes:
+  postgres_data:
